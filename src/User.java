@@ -1,27 +1,26 @@
 public class User {
-    private int userID;
-    private String userName;
-    private String userEmail;
-    private String userAPI;
+    private int id;
+    private String username;
+    private String email;
+    private ApiKey apiKey;
 
-    public User(int userID,String userName,String userEmail,String userAPI){
-        this.userID = userID;
-        this.userName = userName;
-        this.userEmail = userEmail;
-        this.userAPI = userAPI;
-    }
-
-    public String getUserName(){
-        return this.userName;
-    }
-    public String getUserAPI(){
-        return this.userAPI;
-    }
-    public void isValidEmail(){
-        System.out.println(this.userEmail != null && this.userEmail.contains("@"));
+    public User(int id, String username, String email, ApiKey apiKey) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.apiKey = apiKey;
     }
 
-    void userInfo(){
-        System.out.println("User Name: "+userName+" | user Email: "+userEmail+" | User API: "+userAPI);
+    public User(int id, String username, String email) {
+        this(id, username, email, null); // constructor chaining
+    }
+
+    public boolean canAccessApi() {
+        return apiKey != null && apiKey.isActive();
+    }
+
+    public void printUserInfo() {
+        String keyStatus = (apiKey == null) ? "No API Key" : "Key: " + apiKey.getKeyValue() + " | Active: " + apiKey.isActive();
+        System.out.println(username + " | " + email + " | " + keyStatus);
     }
 }
