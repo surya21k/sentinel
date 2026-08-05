@@ -15,6 +15,10 @@ public class User {
         this(id, username, email, null); // constructor chaining
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public boolean canAccessApi() {
         return apiKey != null && apiKey.isActive();
     }
