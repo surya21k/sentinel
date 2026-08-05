@@ -1,16 +1,12 @@
 public class Main {
     public static void main(String[] args) {
-        ApiKey key1 = new ApiKey("abc0122dasgyyu3323453t6l");
+        RateLimitPolicy policy = new RateLimitPolicy(4, 30); // 3 requests per 60 sec
+        ApiKey key1 = new ApiKey("abc123", policy);
         User user1 = new User(1, "ashwin", "ashwin@mail.com", key1);
-        User user2 = new User(2, "priya", "priya@mail.com"); // overloaded constructor, no key
 
-        user1.printUserInfo();
-        user2.printUserInfo();
-
-        System.out.println("Ashwin can access API: " + user1.canAccessApi());
-        System.out.println("Priya can access API: " + user2.canAccessApi());
-
-        key1.deactivate();
-        System.out.println("After deactivation — Ashwin can access API: " + user1.canAccessApi());
+        for (int i = 1; i <= 5; i++) {
+            boolean allowed = key1.canMakeRequest();
+            System.out.println("Request " + i + " allowed: " + allowed);
+        }
     }
 }
