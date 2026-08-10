@@ -15,7 +15,7 @@ public class RateLimitPolicy {
         this.currentCount = 0;
     }
 
-    public boolean allowRequest() {
+    public synchronized boolean allowRequest() {
         if (currentCount < maxRequests) {
             currentCount++;
             return true;
