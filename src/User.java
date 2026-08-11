@@ -15,6 +15,9 @@ public class User {
         this(id, username, email, null); // constructor chaining
     }
 
+    public String getEmail() {
+        return email;
+    }
     public String getUsername() {
         return username;
     }
