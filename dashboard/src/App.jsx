@@ -21,14 +21,20 @@ function App() {
             .catch(err => { setError(err.message); setLoading(false); });
     };
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { fetchUsers(); }, []);
+
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const [formErrors, setFormErrors] = useState({});
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        setFormErrors({});
+
         fetch('http://localhost:8080/api/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -38,12 +44,23 @@ function App() {
                 windowSeconds: Number(formData.windowSeconds)
             })
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errData => { throw errData; });
+                }
+                return response.json();
+            })
             .then(() => {
                 setFormData({ username: '', email: '', apiKey: '', maxRequests: '', windowSeconds: '' });
                 fetchUsers();
             })
-            .catch(err => setError(err.message));
+            .catch(errData => {
+                if (typeof errData === 'object') {
+                    setFormErrors(errData);
+                } else {
+                    setError(errData.message);
+                }
+            });
     };
 
     const handleDelete = (id) => {
@@ -70,6 +87,13 @@ function App() {
                     <input name="maxRequests" type="number" placeholder="Max Requests" value={formData.maxRequests} onChange={handleChange} required />
                     <input name="windowSeconds" type="number" placeholder="Window (sec)" value={formData.windowSeconds} onChange={handleChange} required />
                     <button type="submit">Add User</button>
+                    {Object.keys(formErrors).length > 0 && (
+                        <div style={{ color: 'red', marginBottom: '16px' }}>
+                            {Object.entries(formErrors).map(([field, msg]) => (
+                                <p key={field}>{field}: {msg}</p>
+                            ))}
+                        </div>
+                    )}
                 </form>
 
                 <h2>Registered Users</h2>
