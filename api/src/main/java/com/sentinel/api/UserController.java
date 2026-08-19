@@ -1,5 +1,6 @@
 package com.sentinel.api;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +20,12 @@ public class UserController {
     }
 
     @PostMapping
-    public UserEntity createUser(@RequestBody UserEntity newUser) {
+    public UserEntity createUser(@Valid @RequestBody UserEntity newUser) {
         return userRepository.save(newUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserEntity> updateUser(@PathVariable int id, @RequestBody UserEntity updatedUser) {
+    public ResponseEntity<UserEntity> updateUser(@PathVariable int id, @Valid @RequestBody UserEntity updatedUser)  {
         Optional<UserEntity> existingUser = userRepository.findById(id);
 
         if (existingUser.isEmpty()) {

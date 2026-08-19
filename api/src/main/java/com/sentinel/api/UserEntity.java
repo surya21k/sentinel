@@ -1,6 +1,7 @@
 package com.sentinel.api;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "users")
@@ -10,19 +11,25 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotBlank(message = "Username is required")
     private String username;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
     private String email;
 
+    @NotBlank(message = "API key is required")
     @Column(name = "api_key")
     private String apiKey;
 
+    @Min(value = 1, message = "Max requests must be at least 1")
     @Column(name = "max_requests")
     private int maxRequests;
 
+    @Min(value = 1, message = "Window seconds must be at least 1")
     @Column(name = "window_seconds")
     private int windowSeconds;
 
-    // JPA REQUIRES a no-argument constructor — it creates objects internally before filling fields
     public UserEntity() {}
 
     public UserEntity(String username, String email, String apiKey, int maxRequests, int windowSeconds) {
@@ -33,7 +40,6 @@ public class UserEntity {
         this.windowSeconds = windowSeconds;
     }
 
-    // Getters and setters — JPA needs these to read/write field values
     public int getId() { return id; }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
