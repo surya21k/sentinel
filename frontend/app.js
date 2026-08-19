@@ -1,100 +1,28 @@
-import { useState, useEffect } from 'react';
-import './App.css';
+// Simulated data — later this comes from a real API call to your Java backend
+const users = [
+    { id: 1, username: "ashwin", apiKey: "abc123", isActive: true, requestsUsed: 2, maxRequests: 4 },
+    { id: 2, username: "priya", apiKey: "xyz789", isActive: false, requestsUsed: 0, maxRequests: 2 },
+    { id: 3, username: "surya", apiKey: "def456", isActive: true, requestsUsed: 3, maxRequests: 5 }
+];
 
-function App() {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+function renderUsers(userList) {
+    const tbody = document.getElementById("userTableBody");
+    tbody.innerHTML = ""; // clear existing rows before re-rendering
 
-    const [formData, setFormData] = useState({
-        username: '', email: '', apiKey: '', maxRequests: '', windowSeconds: ''
+    userList.forEach(user => {
+        const statusClass = user.isActive ? "active" : "inactive";
+        const statusText = user.isActive ? "Active" : "Inactive";
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${user.id}</td>
+            <td>${user.username}</td>
+            <td>${user.apiKey}</td>
+            <td><span class="badge ${statusClass}">${statusText}</span></td>
+            <td>${user.requestsUsed} / ${user.maxRequests}</td>
+        `;
+        tbody.appendChild(row);
     });
-
-    const fetchUsers = () => {
-        setLoading(true);
-        fetch('http://localhost:8080/api/users')
-            .then(response => {
-                if (!response.ok) throw new Error('Server responded with status: ' + response.status);
-                return response.json();
-            })
-            .then(data => { setUsers(data); setLoading(false); })
-            .catch(err => { setError(err.message); setLoading(false); });
-    };
-
-    useEffect(() => { fetchUsers(); }, []);
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        fetch('http://localhost:8080/api/users', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...formData,
-                maxRequests: Number(formData.maxRequests),
-                windowSeconds: Number(formData.windowSeconds)
-            })
-        })
-            .then(response => response.json())
-            .then(() => {
-                setFormData({ username: '', email: '', apiKey: '', maxRequests: '', windowSeconds: '' });
-                fetchUsers();
-            })
-            .catch(err => setError(err.message));
-    };
-
-    const handleDelete = (id) => {
-        fetch(`http://localhost:8080/api/users/${id}`, { method: 'DELETE' })
-            .then(() => fetchUsers())
-            .catch(err => setError(err.message));
-    };
-
-    if (loading) return <p>Loading users...</p>;
-    if (error) return <p>Error: {error}</p>;
-
-    return (
-        <>
-            <header className="navbar">
-                <h1>Sentinel Dashboard</h1>
-            </header>
-
-            <main className="container">
-                <h2>Add New User</h2>
-                <form onSubmit={handleSubmit} style={{ marginBottom: '24px' }}>
-                    <input name="username" placeholder="Username" value={formData.username} onChange={handleChange} required />
-                    <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-                    <input name="apiKey" placeholder="API Key" value={formData.apiKey} onChange={handleChange} required />
-                    <input name="maxRequests" type="number" placeholder="Max Requests" value={formData.maxRequests} onChange={handleChange} required />
-                    <input name="windowSeconds" type="number" placeholder="Window (sec)" value={formData.windowSeconds} onChange={handleChange} required />
-                    <button type="submit">Add User</button>
-                </form>
-
-                <h2>Registered Users</h2>
-                <table className="user-table">
-                    <thead>
-                    <tr>
-                        <th>ID</th><th>Username</th><th>API Key</th><th>Max Requests</th><th>Window (sec)</th><th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {users.map(user => (
-                        <tr key={user.id}>
-                            <td>{user.id}</td>
-                            <td>{user.username}</td>
-                            <td>{user.apiKey}</td>
-                            <td>{user.maxRequests}</td>
-                            <td>{user.windowSeconds}</td>
-                            <td><button onClick={() => handleDelete(user.id)}>Delete</button></td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </main>
-        </>
-    );
 }
 
-export default App;
+renderUsers(users);
