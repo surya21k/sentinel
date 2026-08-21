@@ -10,6 +10,8 @@ import java.util.*;
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
+    @Autowired
+    private RateLimiterService rateLimiterService;
 
     @Autowired
     private UserRepository userRepository;
@@ -50,5 +52,23 @@ public class UserController {
         }
         userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/request")
+    public ResponseEntity<String> simulateRequest(@PathVariable int id) {
+        Optional<UserEntity> userOpt = userRepository.findById(id);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserEntity user = userOpt.get();
+        boolean allowed = rateLimiterService.isAllowed(user.getApiKey(), user.getMaxRequests(), user.getWindowSeconds());
+
+        if (allowed) {
+            return ResponseEntity.ok("Request allowed for " + user.getUsername());
+        } else {
+            return ResponseEntity.status(429).body("Rate limit exceeded for " + user.getUsername());
+        }
     }
 }
