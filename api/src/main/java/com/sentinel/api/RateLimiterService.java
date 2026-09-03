@@ -18,7 +18,6 @@ public class RateLimiterService {
         if (currentCount == 1) {
             redisTemplate.expire(redisKey, Duration.ofSeconds(windowSeconds));
         }
-
         return currentCount <= maxRequests;
     }
 }
