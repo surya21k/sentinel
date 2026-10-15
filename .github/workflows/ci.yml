@@ -20,6 +20,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Make mvnw executable
+        working-directory: ./api
+        run: chmod +x mvnw
+
       - name: Build and run tests
         working-directory: ./api
         run: ./mvnw clean verify
