@@ -35,6 +35,7 @@ function App() {
         e.preventDefault();
         setFormErrors({});
 
+
         fetch('http://localhost:8080/api/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
